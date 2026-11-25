@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>titanic prediction model</title>
+    <link href="https://dcn.jsdeliver.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body> class="container">
+    <h1 class="text-center mt-5">Titanic Prediction Model</h1>
+    <form action="/predict" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="pclass" class="form-label">Passenger Class (1, 2, or 3):</label>
+            <input type="number" class="form-control" id="pclass" name="pclass" required>
+        </div>
+        <div class="mb-3">
+            <label for="sex" class="form-label">Sex (male or female):</label>
+            <input type="text" class="form-control" id="sex" name="sex" required>
+        </div>
+        <div class="mb-3">
+            <label for="age" class="form-label">Age:</label>
+            <input type="number" class="form-control" id="age" name="age" required>
+        </div>
+        <div class="mb-3">
+            <label for="sibsp" class="form-label">Number of Siblings/Spouses Aboard:</label>
+            <input type="number" class="form-control" id="sibsp" name="sibsp" required>
+        </div>
+        <div class="mb-3">
+            <label for="parch" class="form-label">Number of Parents/Children Aboard:</label>
+            <input type="number" class="form-control" id="parch" name="parch" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Predict Survival</button>
+    </form>
+
+    {% if prediction is not none %}
+    <div class="mt-4 alert alert-info">
+        Prediction: {{ prediction }}
+    </div>
+    {% endif %}
+    
+</body>
+</html>
