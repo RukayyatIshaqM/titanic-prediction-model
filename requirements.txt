@@ -7,3 +7,4 @@ markupsafe
 werkzeug
 scikit-learn
 itsdangerous
+seaborn
