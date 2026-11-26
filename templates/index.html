@@ -3,40 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>titanic prediction model</title>
-    <link href="https://dcn.jsdeliver.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <meta name="theme-color" content="#081a33">
+    <title>Titanic Survival Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #081a33;
+            --navy-soft: #102846;
+            --gold: #e8b86d;
+            --cream: #f8f5ef;
+            --muted: #6f7c8d;
+            --teal: #1da6a8;
+            --coral: #d66b64;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "DM Sans", sans-serif;
+            color: var(--navy);
+            background:
+                radial-gradient(circle at 90% 10%, rgba(232,184,109,.18), transparent 24rem),
+                linear-gradient(135deg, #edf4f7 0%, #f9f7f1 100%);
+        }
+        .shell { min-height: 100vh; display: grid; grid-template-columns: 38% 62%; }
+        .story {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+            background: linear-gradient(145deg, rgba(8,26,51,.96), rgba(16,40,70,.88)),
+                        url("https://images.unsplash.com/photo-1580077877141-1c60a9edb26e?auto=format&fit=crop&w=1200&q=85") center/cover;
+            padding: clamp(32px, 5vw, 72px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .story::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border: 1px solid rgba(232,184,109,.28);
+            border-radius: 50%;
+            right: -120px;
+            top: 45%;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 12px; }
+        .brand-mark { width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; display: grid; place-items: center; color: var(--gold); font-family: Georgia, serif; font-size: 21px; }
+        .story-copy { position: relative; z-index: 1; max-width: 460px; }
+        .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+        .story h1 { font-family: "Playfair Display", Georgia, serif; font-size: clamp(44px, 5.2vw, 74px); line-height: .98; margin: 16px 0 24px; }
+        .story p { max-width: 390px; color: rgba(255,255,255,.72); line-height: 1.75; }
+        .voyage-meta { display: flex; gap: 28px; border-top: 1px solid rgba(255,255,255,.14); padding-top: 20px; }
+        .voyage-meta strong { display: block; color: var(--gold); font-family: "Playfair Display", Georgia, serif; font-size: 20px; }
+        .voyage-meta span { color: rgba(255,255,255,.55); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
+        .workspace { padding: clamp(28px, 4vw, 60px); display: flex; align-items: center; }
+        .panel { width: 100%; max-width: 760px; margin: auto; }
+        .panel-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 24px; }
+        .panel-heading h2 { font-family: "Playfair Display", Georgia, serif; font-size: clamp(28px, 3vw, 40px); margin: 6px 0 0; }
+        .step { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .1em; }
+        form { background: rgba(255,255,255,.84); border: 1px solid rgba(8,26,51,.07); border-radius: 24px; padding: clamp(20px, 3vw, 32px); box-shadow: 0 24px 60px rgba(25,56,82,.11); backdrop-filter: blur(12px); }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 12px; font-weight: 700; color: #526174; }
+        input, select {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #dde5e9;
+            border-radius: 12px;
+            background: #fbfcfc;
+            color: var(--navy);
+            padding: 0 14px;
+            font: 600 14px "DM Sans", sans-serif;
+            outline: none;
+            transition: .2s ease;
+        }
+        input:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(29,166,168,.1); background: white; }
+        .submit {
+            width: 100%;
+            height: 54px;
+            border: 0;
+            border-radius: 14px;
+            margin-top: 22px;
+            color: white;
+            background: var(--navy);
+            font: 700 14px "DM Sans", sans-serif;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(8,26,51,.18);
+            transition: transform .2s, background .2s;
+        }
+        .submit:hover { transform: translateY(-2px); background: #10365e; }
+        .result-card {
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            gap: 24px;
+            align-items: center;
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 20px;
+            color: white;
+            background: linear-gradient(135deg, #102846, #081a33);
+            animation: reveal .55s ease both;
+        }
+        @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .probability-ring {
+            --progress: {{ survived_probability or 0 }}%;
+            width: 150px;
+            height: 150px;
+            margin: auto;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(var(--gold) var(--progress), rgba(255,255,255,.1) 0);
+            position: relative;
+        }
+        .probability-ring::before { content:""; position:absolute; width:118px; height:118px; border-radius:50%; background:#0d2442; }
+        .ring-copy { position: relative; text-align: center; }
+        .ring-copy strong { display: block; font-family: "Playfair Display", Georgia, serif; font-size: 34px; }
+        .ring-copy span { color: rgba(255,255,255,.58); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+        .result-copy .status { color: var(--gold); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .16em; }
+        .result-copy h3 { font-family: "Playfair Display", Georgia, serif; font-size: 30px; margin: 8px 0 18px; }
+        .bars { display: grid; gap: 12px; }
+        .bar-row { display: grid; grid-template-columns: 96px 1fr 36px; align-items: center; gap: 10px; font-size: 12px; }
+        .bar-track { height: 7px; border-radius: 99px; background: rgba(255,255,255,.09); overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 99px; background: var(--gold); }
+        .bar-fill.no { background: var(--coral); }
+        .profile { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+        .chip { border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:7px 10px; font-size:11px; color:rgba(255,255,255,.72); }
+        .form-tools { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; color:var(--muted); font-size:12px; }
+        .text-button { border:0; padding:8px 0; background:none; color:#167f83; font:700 12px "DM Sans",sans-serif; cursor:pointer; }
+        .form-error { margin:0 0 18px; padding:12px 14px; border:1px solid #f1c5c1; border-radius:12px; color:#8f3029; background:#fff3f1; font-size:13px; }
+        .submit:disabled { opacity:.75; cursor:wait; transform:none; }
+        :focus-visible { outline:3px solid rgba(29,166,168,.55); outline-offset:3px; }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
+        @media (max-width: 900px) {
+            .shell { grid-template-columns: 1fr; }
+            .story { min-height: 380px; }
+            .story h1 { font-size: 48px; }
+            .workspace { padding: 28px 18px 40px; }
+        }
+        @media (max-width: 580px) {
+            .story { min-height: 330px; padding: 24px; }
+            .story h1 { font-size: 40px; }
+            .voyage-meta { gap: 18px; }
+            .form-grid, .result-card { grid-template-columns: 1fr; }
+            .panel-heading { align-items:flex-start; }
+            .probability-ring { width: 132px; height: 132px; }
+            .probability-ring::before { width: 104px; height: 104px; }
+        }
+    </style>
 </head>
-<body> class="container">
-    <h1 class="text-center mt-5">Titanic Prediction Model</h1>
-    <form action="/predict" method="post" class="mt-4">
-        <div class="mb-3">
-            <label for="pclass" class="form-label">Passenger Class (1, 2, or 3):</label>
-            <input type="number" class="form-control" id="pclass" name="pclass" required>
-        </div>
-        <div class="mb-3">
-            <label for="sex" class="form-label">Sex (male or female):</label>
-            <input type="text" class="form-control" id="sex" name="sex" required>
-        </div>
-        <div class="mb-3">
-            <label for="age" class="form-label">Age:</label>
-            <input type="number" class="form-control" id="age" name="age" required>
-        </div>
-        <div class="mb-3">
-            <label for="sibsp" class="form-label">Number of Siblings/Spouses Aboard:</label>
-            <input type="number" class="form-control" id="sibsp" name="sibsp" required>
-        </div>
-        <div class="mb-3">
-            <label for="parch" class="form-label">Number of Parents/Children Aboard:</label>
-            <input type="number" class="form-control" id="parch" name="parch" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Predict Survival</button>
-    </form>
+<body>
+    <main class="shell">
+        <section class="story">
+            <div class="brand"><span class="brand-mark">T</span> Titanic Archive</div>
+            <div class="story-copy">
+                <div class="eyebrow">Voyage intelligence</div>
+                <h1>Every passenger has a story.</h1>
+                <p>Explore how passenger class, age, family, and fare may have shaped survival aboard the RMS Titanic.</p>
+            </div>
+            <div class="voyage-meta">
+                <div><strong>1912</strong><span>Voyage year</span></div>
+                <div><strong>Southampton</strong><span>Departure</span></div>
+            </div>
+        </section>
 
-    {% if prediction is not none %}
-    <div class="mt-4 alert alert-info">
-        Prediction: {{ prediction }}
-    </div>
-    {% endif %}
-    
+        <section class="workspace">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div><div class="eyebrow">Prediction model</div><h2>Passenger profile</h2></div>
+                    <div class="step">01 / 01</div>
+                </div>
+                <form action="{{ url_for('predict') }}" method="post" id="passenger-form">
+                    {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="pclass">Passenger class</label>
+                            <select id="pclass" name="pclass" required>
+                                <option value="">Select class</option>
+                                {% for option in range(1, 4) %}
+                                <option value="{{ option }}" {% if values and values.pclass == option %}selected{% endif %}>{{ option }}{% if option == 1 %} — First{% elif option == 2 %} — Second{% else %} — Third{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="sex">Passenger sex</label>
+                            <select id="sex" name="sex" required>
+                                <option value="">Select sex</option>
+                                <option value="0" {% if values.sex|default(-1)|int == 0 %}selected{% endif %}>Female</option>
+                                <option value="1" {% if values.sex|default(-1)|int == 1 %}selected{% endif %}>Male</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="embarked">Port of embarkation</label>
+                            <select id="embarked" name="embarked" required>
+                                <option value="">Select port</option>
+                                <option value="S" {% if values.embarked|default('') == 'S' %}selected{% endif %}>Southampton</option>
+                                <option value="C" {% if values.embarked|default('') == 'C' %}selected{% endif %}>Cherbourg</option>
+                                <option value="Q" {% if values.embarked|default('') == 'Q' %}selected{% endif %}>Queenstown</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" min="0" max="100" step="0.1" placeholder="e.g. 29" value="{{ values.age|default('') }}" required>
+                        </div>
+                        <div class="field">
+                            <label for="fare">Ticket fare</label>
+                            <input type="number" id="fare" name="fare" min="0" step="0.01" placeholder="e.g. 32.50" value="{{ values.fare|default('') }}" required>
+                        </div>
+                        <div class="field">
+                            <label for="sibsp">Siblings / spouse aboard</label>
+                            <input type="number" id="sibsp" name="sibsp" min="0" max="10" placeholder="e.g. 1" value="{{ values.sibsp|default('') }}" required>
+                        </div>
+                        <div class="field">
+                            <label for="parch">Parents / children aboard</label>
+                            <input type="number" id="parch" name="parch" min="0" max="10" placeholder="e.g. 0" value="{{ values.parch|default('') }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit" id="submit-button">Predict survival</button>
+                    <div class="form-tools"><span id="family-summary" aria-live="polite">Add family aboard to see group size.</span><button class="text-button" type="reset">Clear form</button></div>
+                </form>
+
+                {% if prediction is not none %}
+                <div class="result-card">
+                    <div class="probability-ring">
+                        <div class="ring-copy"><strong>{{ survived_probability }}%</strong><span>Survival</span></div>
+                    </div>
+                    <div class="result-copy">
+                        <div class="status">Model prediction</div>
+                        <h3>{{ result }}</h3>
+                        <div class="bars">
+                            <div class="bar-row"><span>Survived</span><div class="bar-track"><div class="bar-fill" style="width: {{ survived_probability }}%"></div></div><strong>{{ survived_probability }}%</strong></div>
+                            <div class="bar-row"><span>Did not</span><div class="bar-track"><div class="bar-fill no" style="width: {{ not_survived_probability }}%"></div></div><strong>{{ not_survived_probability }}%</strong></div>
+                        </div>
+                        <div class="profile">
+                            <span class="chip">{{ values.age|round|int }} years old</span>
+                            <span class="chip">Class {{ values.pclass }}</span>
+                            <span class="chip">{{ family_size }} travelers in family</span>
+                            <span class="chip">Embarked at {{ {'S': 'Southampton', 'C': 'Cherbourg', 'Q': 'Queenstown'}.get(values.embarked, values.embarked) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+    <script>
+        const form = document.getElementById('passenger-form');
+        const familySummary = document.getElementById('family-summary');
+        const count = name => Number(form.elements[name].value || 0);
+        function updateFamily() {
+            const size = count('sibsp') + count('parch') + 1;
+            familySummary.textContent = (form.elements.sibsp.value || form.elements.parch.value)
+                ? `${size} passenger${size === 1 ? '' : 's'} in this family group` : 'Add family aboard to see group size.';
+        }
+        form.addEventListener('input', updateFamily);
+        form.addEventListener('change', updateFamily);
+        form.addEventListener('reset', () => setTimeout(updateFamily, 0));
+        form.addEventListener('submit', () => {
+            const button = document.getElementById('submit-button');
+            button.disabled = true;
+            button.textContent = 'Calculating…';
+        });
+        updateFamily();
+    </script>
 </body>
 </html>
